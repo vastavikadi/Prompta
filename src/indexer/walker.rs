@@ -1,3 +1,4 @@
+use super::metadata::{collect_metadata, print_metadata};
 use std::path::Path;
 use walkdir::WalkDir;
 
@@ -15,16 +16,17 @@ fn is_ignored(path: &Path) -> bool {
         .any(|c| IGNORED.contains(&c.as_os_str().to_string_lossy().as_ref()))
 }
 
-fn traverse_dir() {
+pub fn traverse_dir() {
     for entry in WalkDir::new(".")
         .into_iter()
         .filter_map(|e| e.ok())
         .filter(|e| !is_ignored(e.path()))
     {
-        println!("{}", entry.path().display())
-    }
-}
+        let path = entry.path();
 
-fn main() {
-    traverse_dir()
+        match collect_metadata(path) {
+            Ok(metadata) => print_metadata(path, &metadata),
+            Err(e) => eprintln!("Error reading metadata for {}: {}", path.display(), e),
+        }
+    }
 }

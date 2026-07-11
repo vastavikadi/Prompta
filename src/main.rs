@@ -1,3 +1,6 @@
+mod indexer;
+use indexer::walker::traverse_dir;
+
 fn main() {
-    println!("Hello, world!");
+    traverse_dir()
 }
