@@ -1,23 +1,13 @@
+use super::ignore::is_ignored;
 use super::metadata::{collect_metadata, print_metadata};
-use std::path::Path;
 use walkdir::WalkDir;
 
-const IGNORED: &[&str] = &[
-    ".git",
-    "node_modules",
-    "target",
-    "dist",
-    "build",
-    "__pycache__",
-];
+/*
+Traverse fn for the project directory
+*/
 
-fn is_ignored(path: &Path) -> bool {
-    path.components()
-        .any(|c| IGNORED.contains(&c.as_os_str().to_string_lossy().as_ref()))
-}
-
-pub fn traverse_dir() {
-    for entry in WalkDir::new(".")
+pub fn traverse_dir(input: &str) {
+    for entry in WalkDir::new(input)
         .into_iter()
         .filter_map(|e| e.ok())
         .filter(|e| !is_ignored(e.path()))
