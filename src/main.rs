@@ -2,7 +2,7 @@ mod indexer;
 mod models;
 mod utils;
 
-use crate::indexer::walker::traverse_dir;
+use crate::indexer::walker::scan_project;
 
 use std::io;
 
@@ -19,9 +19,27 @@ fn main() {
     // if the user presses Enter without providing a path, use the current directory
     if input.is_empty() {
         println!("No input provided. Using the current directory.");
-        traverse_dir(".");
+        let index = match scan_project(".") {
+            Ok(index) => index,
+            Err(e) => {
+                eprintln!("Error scanning the project: {}", e);
+                return;
+            }
+        };
+        for (path, metadata) in &index.metadata {
+            println!("{}: {} ({})", path.display(), metadata.id, metadata.size);
+        }
     } else {
         println!("Indexing the provided directory: {}", input);
-        traverse_dir(input);
+        let index = match scan_project(input) {
+            Ok(index) => index,
+            Err(e) => {
+                eprintln!("Error scanning the project: {}", e);
+                return;
+            }
+        };
+        for (path, metadata) in &index.metadata {
+            println!("{}: {} ({})", path.display(), metadata.id, metadata.size);
+        }
     }
 }
